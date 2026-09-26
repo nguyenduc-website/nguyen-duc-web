@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Nguyễn Đức - Sensi Pro, cộng đồng, tin tức và hỗ trợ 24/7">
+<title>Nguyễn Đức</title>
+<link rel="stylesheet" href="css/style.css"><link rel="icon" href="https://sf-static.upanhlaylink.com/img/image_20260926c9cbd15da7c975fc5c974713e836510c.jpg" id="favicon">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header class="top-bar"><div class="top-bar-content">
+<a class="brand-mini" href="#home"><img src="https://sf-static.upanhlaylink.com/img/image_20260926c9cbd15da7c975fc5c974713e836510c.jpg" id="miniLogo" alt="Logo"><span id="brandName">Nguyễn Đức</span></a>
+<div class="top-actions"><span id="userGreeting" class="user-greeting hidden"></span><a href="auth/login.html" id="loginBtn" class="btn-top"><i class="fas fa-user"></i> Đăng nhập</a><a href="admin/dashboard.html" id="adminBtn" class="btn-top btn-admin hidden"><i class="fas fa-shield-halved"></i> Quản trị</a><button id="logoutBtn" class="btn-top hidden" onclick="logout()"><i class="fas fa-right-from-bracket"></i></button></div>
+</div></header>
+
+<main class="container" id="home">
+<section class="hero profile-section"><div class="logo-wrapper"><img src="https://sf-static.upanhlaylink.com/img/image_20260926c9cbd15da7c975fc5c974713e836510c.jpg" id="mainLogo" alt="Nguyễn Đức"><div class="verified-badge"><i class="fas fa-check"></i></div></div><h1 id="profileName">Nguyễn Đức</h1><p class="profile-role" id="profileRole">Quản trị viên & Developer</p><p class="profile-desc" id="profileDesc">Website cộng đồng • Sensi Pro • Phòng chat • Tin tức • Hỗ trợ 24/7</p></section>
+
+<nav class="tabbar" aria-label="Điều hướng">
+<a href="#home"><i class="fas fa-house"></i><span>Trang chủ</span></a><a href="#sensi"><i class="fas fa-sliders"></i><span>Sensi Pro</span></a><a href="#chat"><i class="fas fa-comments"></i><span>Phòng Chat</span></a><a href="#ranking"><i class="fas fa-ranking-star"></i><span>Xếp hạng</span></a><a href="#news"><i class="fas fa-bullhorn"></i><span>Thông báo</span></a><a href="#media"><i class="fas fa-download"></i><span>Media</span></a><a href="#support"><i class="fas fa-headset"></i><span>Hỗ trợ</span></a><a href="#security"><i class="fas fa-shield-halved"></i><span>An ninh</span></a></nav>
+
+<section class="stats-section"><div class="stat-box"><b id="statProducts">150+</b><span>Sản phẩm</span></div><div class="stat-box"><b id="statDocs">500+</b><span>Tài liệu</span></div><div class="stat-box"><b id="statFollowers">10K+</b><span>Theo dõi</span></div></section>
+
+<section id="sensi" class="panel protected-section" data-requires-login="true"><div class="section-head"><div><span class="eyebrow">PHẦN 7</span><h2><i class="fas fa-crosshairs"></i> Sensi Pro Nguyễn Đức</h2></div></div>
+<div class="search-box"><input id="phoneIn" placeholder="Nhập tên thiết bị cần tối ưu..." maxlength="80"><button onclick="updateSensi()"><i class="fas fa-arrow-right"></i></button></div>
+<div id="sensiResult" class="sensi-result hidden"><div><b id="sensiDevice">Device</b><small>Tạo thông số tham khảo</small></div><div class="fire-btn-circle"><b id="fireNum">--%</b><small>NÚT BẮN</small></div></div><div id="sensiList" class="sensi-list"></div>
+<p class="note">Sensi Pro tạo thông số ngẫu nhiên để tham khảo, không can thiệp vào thiết bị hay trò chơi.</p></section>
+
+<section id="chat" class="panel protected-section" data-requires-login="true"><div class="section-head"><div><span class="eyebrow">PHẦN 8</span><h2><i class="fas fa-comments"></i> Phòng Chat cho anh em</h2></div></div>
+<div id="chatMessages" class="chat-box"></div><form onsubmit="sendChatForm(event)" class="chat-form"><input id="chatInput" maxlength="500" placeholder="Viết tin nhắn..."><button><i class="fas fa-paper-plane"></i></button></form><p class="note">Tin nhắn được lưu tập trung trên server và tự đồng bộ cho mọi thiết bị đang truy cập website.</p></section>
+
+<section id="ranking" class="panel protected-section" data-requires-login="true"><div class="section-head"><div><span class="eyebrow">PHẦN 9 • 11 • 12</span><h2><i class="fas fa-ranking-star"></i> Bảng xếp hạng</h2></div></div><div class="rank-grid"><div><h3><i class="fas fa-eye"></i> Lượt truy cập</h3><div id="visitRanking"></div></div><div><h3><i class="fas fa-message"></i> Chat nhiều nhất</h3><div id="chatRanking"></div></div></div></section>
+
+<section id="news" class="panel"><div class="section-head"><div><span class="eyebrow">PHẦN 13 • 14</span><h2><i class="fas fa-bullhorn"></i> Thông báo & Tin tức</h2></div></div><div id="announcementList"></div><p class="note">Admin/Quản trị viên đăng thông báo từ bảng quản trị.</p></section>
+
+<section id="media" class="panel protected-section" data-requires-login="true"><div class="section-head"><div><span class="eyebrow">MEDIA LINKS</span><h2><i class="fas fa-download"></i> Tải File & Media</h2></div></div><div id="mediaList" class="media-list"><div class="empty-state">Đang tải danh sách...</div></div></section>
+<section id="support" class="panel protected-section" data-requires-login="true"><div class="section-head"><div><span class="eyebrow">PHẦN 15</span><h2><i class="fas fa-headset"></i> Hỗ trợ 24/7</h2></div></div><div id="supportGrid" class="support-grid"></div></section>
+
+<section class="panel clock-panel"><span class="eyebrow">PHẦN 16</span><h2><i class="fas fa-clock"></i> Đồng hồ thời gian thực</h2><div id="liveClock" class="live-clock">Đang tải...</div></section>
+
+<section id="security" class="panel"><div class="section-head"><div><span class="eyebrow">PHẦN 18 • 19</span><h2><i class="fas fa-shield-halved"></i> An ninh mạng trong 5 phút</h2></div></div>
+<div class="security-grid"><article><h3>01. Không tin dữ liệu đầu vào</h3><p>Validate đầu vào → xử lý an toàn → encode output → phân quyền tối thiểu → log & cập nhật.</p></article><article><h3>02. SQL Injection</h3><p>Dùng prepared/parameterized query, giới hạn quyền DB và không lộ lỗi SQL chi tiết.</p></article><article><h3>03. XSS</h3><p>Encode output, tránh DOM không an toàn, cookie HttpOnly/Secure/SameSite phù hợp và CSP.</p></article><article><h3>04. Broken Access Control</h3><p>Kiểm tra quyền ở server trên từng request nhạy cảm; không dựa vào nút ẩn trên giao diện.</p></article><article><h3>05. Checklist trước public</h3><p>Không lộ secret/debug; validate upload; kiểm tra IDOR/leo thang quyền; HTTPS; security headers; CORS giới hạn; DB không public; backup & giám sát.</p></article></div>
+</section>
+
+<section class="panel"><span class="eyebrow">PHẦN 17</span><h2><i class="fas fa-palette"></i> Giao diện</h2><p>Giao diện sử dụng phong cách glassmorphism, card và micro-animation lấy cảm hứng từ các UI component hiện đại. Có thể tham khảo thêm <a href="https://uiverse.io/elements?page=4" target="_blank" rel="noopener">UIverse</a>.</p></section>
+</main>
+<div id="toast" class="toast"></div>
+<footer class="footer">© <span id="currentYear"></span> Nguyễn Đức • Website cộng đồng</footer>
+<script src="js/app.js"></script>
+</body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quản trị • Nguyễn Đức</title><link rel="stylesheet" href="../css/style.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head>
+<body><div class="admin-layout"><div class="admin-header"><h1><i class="fas fa-shield-halved"></i> Quản trị Nguyễn Đức</h1><div><a href="../index.html" class="btn-secondary">Trang chính</a> <button onclick="logout()" class="btn-danger">Đăng xuất</button></div></div>
+<div id="denied" class="admin-panel active"><h2>Đang kiểm tra quyền...</h2></div>
+<div id="adminApp" class="hidden">
+<div class="admin-tabs">
+<button class="admin-tab-btn active" onclick="showPanel('overview',this)">Tổng quan</button>
+<button class="admin-tab-btn" onclick="showPanel('maintenance',this)">Bảo trì</button>
+<button class="admin-tab-btn" onclick="showPanel('news',this)">Thông báo</button>
+<button class="admin-tab-btn" onclick="showPanel('users',this)">Người dùng</button>
+<button class="admin-tab-btn" onclick="showPanel('requests',this)">Quên mật khẩu</button>
+<button class="admin-tab-btn" onclick="showPanel('brand',this)">Tên & Logo</button>
+<button class="admin-tab-btn" onclick="showPanel('contacts',this)">Hỗ trợ</button><button class="admin-tab-btn" onclick="showPanel('media',this)">Media Links</button>
+</div>
+<div id="panel-maintenance" class="admin-panel">
+<h2>Chế độ bảo trì Website</h2>
+<p class="note">Khi bật, khách truy cập và tài khoản User sẽ thấy thông báo bảo trì. Admin và Moderator vẫn có thể truy cập để quản trị. Trạng thái được lưu trên server nên đồng bộ cho mọi thiết bị.</p>
+<div id="maintenanceState" class="note">Đang kiểm tra trạng thái...</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+<button id="maintenanceOnBtn" class="btn-danger" onclick="setMaintenance(true)">BẬT BẢO TRÌ</button>
+<button id="maintenanceOffBtn" class="btn-primary" onclick="setMaintenance(false)">RELOAD WEBSITE / TẮT BẢO TRÌ</button>
+</div>
+</div>
+<div id="panel-overview" class="admin-panel active"><h2>Tổng quan</h2><div class="grid-2"><div class="admin-stat"><b id="uCount">0</b><span>Người dùng</span></div><div class="admin-stat"><b id="vCount">0</b><span>Lượt truy cập</span></div><div class="admin-stat"><b id="cCount">0</b><span>Tin nhắn</span></div><div class="admin-stat"><b id="nCount">0</b><span>Thông báo</span></div></div><h3>Quyền hạn</h3><p class="note">Admin có toàn quyền quản lý website. Moderator được đăng/xóa thông báo nhưng không được quản lý quyền Admin hay người dùng.</p></div>
+<div id="panel-news" class="admin-panel"><h2>Đăng thông báo</h2><div class="form-group"><label>Tiêu đề</label><input id="newsTitle" class="form-input" maxlength="120"></div><div class="form-group"><label>Nội dung</label><textarea id="newsBody" class="form-input" rows="6" maxlength="5000"></textarea></div><div class="form-group"><label>URL ảnh (tùy chọn)</label><input id="newsImage" class="form-input" type="url" maxlength="1000"></div><button class="btn-primary" onclick="publishNews()">Đăng thông báo</button><div id="newsManage" style="margin-top:18px"></div></div>
+<div id="panel-users" class="admin-panel"><h2>Quản lý người dùng</h2><div id="usersManage"></div></div>
+<div id="panel-requests" class="admin-panel"><h2>Yêu cầu quên mật khẩu</h2><p class="note">Tài khoản và yêu cầu đặt lại mật khẩu được lưu tập trung trên server. Thay đổi có hiệu lực trên mọi thiết bị.</p><div id="requestsManage"></div></div>
+<div id="panel-brand" class="admin-panel"><h2>Tên & Logo</h2><p class="note">Tên website đã cố định là Nguyễn Đức theo yêu cầu.</p><div class="form-group"><label>URL logo</label><input id="logoUrl" class="form-input" type="url"></div><button class="btn-primary" onclick="saveBrand()">Lưu logo</button></div>
+<div id="panel-media" class="admin-panel"><h2>Quản lý Media Links</h2><p class="note">Media được lưu tập trung trên server. Mọi thiết bị truy cập website đều thấy cùng dữ liệu.</p>
+<div class="media-form-grid"><div class="form-group"><label>1. Tên File</label><input id="mediaTitle" class="form-input" maxlength="160" placeholder="Tên file"></div><div class="form-group"><label>2. Phiên bản</label><input id="mediaVersion" class="form-input" maxlength="50" placeholder="1.0.0"></div><div class="form-group"><label>3. URL ảnh</label><input id="mediaImage" class="form-input" type="url" maxlength="1000" placeholder="https://..."></div><div class="form-group"><label>4. Link Media / tải trực tiếp</label><input id="mediaUrl" class="form-input" type="url" maxlength="2000" placeholder="https://..."></div></div>
+<button class="btn-primary" onclick="adminAddMedia()">Tạo File</button> <button class="btn-secondary" onclick="adminLoadMedia()">Tải lại danh sách</button><div id="mediaAdminList" style="margin-top:18px"></div><p id="mediaStatus" class="note"></p></div>
+<div id="panel-contacts" class="admin-panel"><h2>Hỗ trợ 24/7</h2><div class="form-group"><label>Zalo 1</label><input id="z1" class="form-input"></div><div class="form-group"><label>Zalo 2</label><input id="z2" class="form-input"></div><div class="form-group"><label>Email</label><input id="em" class="form-input"></div><div class="form-group"><label>TikTok</label><input id="tt" class="form-input"></div><button class="btn-primary" onclick="saveContactsAdmin()">Lưu</button></div>
+</div></div>
+<script src="../js/app.js"></script><script>
+async function bootAdmin(){
+  try{await syncState();}catch(e){document.getElementById('denied').innerHTML='<h2>Không thể kết nối máy chủ</h2><p>'+escapeHTML(e.message)+'</p>';return}
+  const me=getCurrentUser();
+  if(!me||!canManage()){document.getElementById('denied').innerHTML='<h2>Không có quyền truy cập</h2><p>Bạn cần tài khoản Admin hoặc Moderator.</p><a class="btn-primary" href="../auth/login.html">Đăng nhập</a>';return}
+  document.getElementById('denied').classList.add('hidden');document.getElementById('adminApp').classList.remove('hidden');
+  if(me.role!=='admin'){
+    ['users','requests','brand','contacts'].forEach(id=>{const b=[...document.querySelectorAll('.admin-tab-btn')].find(x=>x.getAttribute('onclick')?.includes("'"+id+"'"));if(b)b.style.display='none'});
+    document.getElementById('panel-users')?.classList.add('hidden');document.getElementById('panel-requests')?.classList.add('hidden');document.getElementById('panel-brand')?.classList.add('hidden');document.getElementById('panel-contacts')?.classList.add('hidden');
+  }
+  await initAdmin();
+}
+bootAdmin();
+function showPanel(id,btn){document.querySelectorAll('.admin-panel').forEach(x=>x.classList.remove('active'));document.getElementById('panel-'+id).classList.add('active');document.querySelectorAll('.admin-tab-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+async function initAdmin(){await syncState();renderMaintenancePanel();await renderStats();renderNews();if(isAdmin()){renderUsers();await renderRequests();const c=getConfig();logoUrl.value=c.logo;z1.value=c.contacts.zalo1;z2.value=c.contacts.zalo2;em.value=c.contacts.email;tt.value=c.contacts.tiktok}await adminLoadMedia()}
+function renderMaintenancePanel(){
+  const enabled=Boolean(getConfig().maintenance?.enabled);
+  const state=document.getElementById('maintenanceState');
+  const on=document.getElementById('maintenanceOnBtn');
+  const off=document.getElementById('maintenanceOffBtn');
+  if(state)state.textContent=enabled?'● ĐANG BẢO TRÌ — User sẽ thấy màn hình bảo trì.':'● HỆ THỐNG ĐANG HOẠT ĐỘNG BÌNH THƯỜNG';
+  if(on)on.disabled=enabled;
+  if(off)off.disabled=!enabled;
+}
+async function setMaintenance(enabled){
+  if(!isAdmin())return alert('Chỉ Admin mới có quyền bật/tắt bảo trì.');
+  const msg=enabled
+    ? 'Bật chế độ bảo trì cho toàn bộ User và khách truy cập?'
+    : 'Tắt bảo trì và đưa website hoạt động bình thường?';
+  if(!confirm(msg))return;
+  try{
+    await api('/admin/maintenance',{method:'PATCH',body:JSON.stringify({enabled})});
+    await syncState();
+    renderMaintenancePanel();
+    alert(enabled?'Đã bật chế độ bảo trì.':'Đã tắt bảo trì, website hoạt động bình thường.');
+  }catch(e){alert(e.message)}
+}
+
+async function renderStats(){try{const r=await api('/admin/stats');uCount.textContent=r.users;vCount.textContent=r.visits;cCount.textContent=r.chat;nCount.textContent=r.announcements}catch(e){}}
+async function publishNews(){if(!canManage())return;const ok=await addAnnouncement(newsTitle.value,newsBody.value,newsImage.value);if(!ok)return;newsTitle.value='';newsBody.value='';newsImage.value='';renderNews();renderStats();alert('Đã đăng thông báo và đồng bộ cho mọi thiết bị.')}
+function renderNews(){newsManage.innerHTML=getAnnouncements().map(n=>`<div class="user-item"><div class="user-info"><strong>${escapeHTML(n.title)}</strong><small>${escapeHTML(n.author)} • ${new Date(n.at).toLocaleString('vi-VN')}</small></div>${isAdmin()?`<button class="btn-danger" onclick="removeNews('${escapeHTML(n.id)}')">Xóa</button>`:''}</div>`).join('')||'<div class="empty-state">Chưa có thông báo</div>'}
+async function removeNews(id){if(await deleteAnnouncement(id)){renderNews();renderStats()}}
+function renderUsers(){if(!isAdmin())return;usersManage.innerHTML=getUsers().map(u=>`<div class="user-item"><div class="user-info"><strong>${escapeHTML(u.fullname||u.username)} <span class="role-badge ${escapeHTML(u.role)}">${escapeHTML(u.role)}</span></strong><small>@${escapeHTML(u.username)} • ${escapeHTML(u.email)} • Views: ${u.views||0} • Chat: ${u.chats||0}</small></div>${u.username!=='ducadmin'?`<div><button class="btn-secondary" onclick="toggleRole('${escapeHTML(u.id)}')">${u.role==='moderator'?'Hạ User':'Cấp Moderator'}</button><button class="btn-danger" onclick="delUser('${escapeHTML(u.id)}')">Xóa</button></div>`:''}</div>`).join('')||'<div class="empty-state">Chưa có người dùng.</div>'}
+async function toggleRole(id){if(!isAdmin())return;const u=getUsers().find(x=>String(x.id)===String(id));if(!u)return;const role=u.role==='moderator'?'user':'moderator';try{await api('/admin/users/'+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({role})});await syncState();renderUsers();alert('Đã cập nhật quyền và đồng bộ toàn hệ thống.')}catch(e){alert(e.message)}}
+async function delUser(id){if(!isAdmin()||!confirm('Xóa tài khoản này?'))return;try{await api('/admin/users/'+encodeURIComponent(id),{method:'DELETE'});await syncState();renderUsers();renderStats()}catch(e){alert(e.message)}}
+async function renderRequests(){if(!isAdmin())return;try{const r=await api('/admin/password-requests');const a=r.requests||[];requestsManage.innerHTML=a.map(x=>`<div class="user-item"><div class="user-info"><strong>${escapeHTML(x.query)}</strong><small>${new Date(x.at).toLocaleString('vi-VN')} • ${x.status==='resolved'?'Đã xử lý':'Đang chờ'}</small></div><div class="request-actions">${x.status!=='resolved'?`<button class="btn-primary" onclick="resetCustomerPassword('${escapeHTML(x.id)}')">Đặt mật khẩu mới</button><button class="btn-secondary" onclick="resolveReq('${escapeHTML(x.id)}')">Đánh dấu đã xử lý</button>`:''}</div></div>`).join('')||'<div class="empty-state">Không có yêu cầu.</div>'}catch(e){requestsManage.innerHTML='<div class="empty-state">'+escapeHTML(e.message)+'</div>'}}
+async function resetCustomerPassword(id){if(!isAdmin())return alert('Chỉ Admin mới được đặt lại mật khẩu.');const pw=prompt('Nhập mật khẩu tạm thời mới (tối thiểu 8 ký tự):');if(pw===null)return;if(pw.length<8)return alert('Mật khẩu phải có ít nhất 8 ký tự.');try{await api('/admin/password-reset',{method:'POST',body:JSON.stringify({id,password:pw})});await renderRequests();alert('Đã đổi mật khẩu trên server. Mật khẩu mới có hiệu lực trên mọi thiết bị.')}catch(e){alert(e.message)}}
+async function resolveReq(id){if(!isAdmin())return;try{await api('/admin/password-request-resolve',{method:'POST',body:JSON.stringify({id})});await renderRequests()}catch(e){alert(e.message)}}
+async function saveBrand(){if(!isAdmin())return;try{await api('/config',{method:'PATCH',body:JSON.stringify({logo:logoUrl.value.trim()})});await syncState();alert('Đã lưu logo và đồng bộ cho mọi thiết bị.')}catch(e){alert(e.message)}}
+async function saveContactsAdmin(){if(!isAdmin())return;try{await api('/config',{method:'PATCH',body:JSON.stringify({contacts:{zalo1:z1.value,zalo2:z2.value,email:em.value,tiktok:tt.value}})});await syncState();alert('Đã lưu hỗ trợ và đồng bộ cho mọi thiết bị.')}catch(e){alert(e.message)}}
+let adminMediaItems=[];
+async function adminLoadMedia(){const s=document.getElementById('mediaStatus');s.textContent='Đang tải...';try{await syncState();adminMediaItems=APP.media||[];renderAdminMedia();s.textContent='Đã tải '+adminMediaItems.length+' file từ server, dùng chung cho mọi thiết bị.'}catch(e){s.textContent='Không thể đọc dữ liệu Media: '+e.message}}
+function renderAdminMedia(){const el=document.getElementById('mediaAdminList');if(!el)return;el.innerHTML=adminMediaItems.map(m=>`<div class="media-admin-row">${m.image?`<img src="${escapeHTML(m.image)}" alt="">`:''}<div class="media-info"><b>${escapeHTML(m.title)}</b><small>Phiên bản ${escapeHTML(m.version||'')} • ${escapeHTML(m.url)}</small></div><button class="btn-danger" onclick="adminDeleteMedia('${escapeHTML(m.id)}')">Xóa</button></div>`).join('')||'<div class="empty-state">Chưa có file nào.</div>'}
+async function adminAddMedia(){if(!canManage())return alert('Bạn không có quyền.');const title=mediaTitle.value.trim(),version=mediaVersion.value.trim(),image=mediaImage.value.trim(),url=mediaUrl.value.trim();if(!title||!version||!url)return alert('Vui lòng nhập Tên File, Phiên bản và Link tải.');try{await api('/media',{method:'POST',body:JSON.stringify({title,version,image,url})});mediaTitle.value='';mediaVersion.value='';mediaImage.value='';mediaUrl.value='';await adminLoadMedia();alert('Đã thêm Media và đồng bộ cho mọi thiết bị.')}catch(e){alert(e.message)}}
+async function adminDeleteMedia(id){if(!canManage()||!confirm('Xóa file này khỏi Media Links của toàn website?'))return;try{await api('/media/'+encodeURIComponent(id),{method:'DELETE'});await adminLoadMedia()}catch(e){alert(e.message)}}
+</script></body></html>
