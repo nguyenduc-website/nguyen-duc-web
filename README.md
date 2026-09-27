@@ -1,50 +1,76 @@
-# Nguyen Duc Web — Self-hosted
+# Nguyen Duc Web — Self-hosted + NgducAntiBot
 
-Bản này đã bỏ Netlify Functions và Netlify Blobs. Backend là Node.js + Express, dữ liệu dùng file JSON bền vững trong `data/database.json`.
+Website Node.js + Express cho Nguyễn Đức. Bản này bổ sung lớp **NgducAntiBot** 10–15 giây, popup thông báo Admin sau xác minh, rate-limit API và storage bền vững qua Supabase.
 
-## Có sẵn
+## Chức năng
 - Đăng ký / đăng nhập / đăng xuất
+- Session cookie HTTP-only, thời hạn 30 ngày
 - Role `user`, `moderator`, `admin`
-- Chat đồng bộ qua server
-- Media links
+- Chat đồng bộ server
+- Media Links đồng bộ server
 - Thông báo
-- Quản lý user và role
-- Password-reset requests và Admin reset
+- Quản lý user/role
+- Password reset request + Admin reset
 - Leaderboard / visits
-- Cấu hình logo + liên hệ
-- Cookie session HTTP-only
-- Password hash bằng scrypt
+- Cấu hình logo/liên hệ
+- Chế độ bảo trì
+- NgducAntiBot 10–15 giây
+- Popup thông báo Admin sau xác minh
+- Rate-limit cho API để giảm abuse
 
-## Chạy ngay trên máy/Termux
+## Deploy Render + Supabase (khuyến nghị)
+
+Render Free không có persistent disk. Nếu muốn **user, session, chat, ranking, media, thông báo và cấu hình không mất sau redeploy/restart**, hãy dùng Supabase theo `SUPABASE_SETUP.md`.
+
+Thêm vào Render Environment Variables:
+
+```text
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_KEY
+ANTIBOT_SECRET=YOUR_LONG_RANDOM_SECRET
+ADMIN_USERNAME=ducadmin
+ADMIN_EMAIL=admin@nguyenduc.local
+ADMIN_PASSWORD=CHANGE_THIS
+```
+
+Sau deploy kiểm tra:
+
+```text
+https://nguyen-duc-web.onrender.com/api/health
+```
+
+Phải có:
+
+```json
+{"persistent":true,"storage":"supabase-persistent"}
+```
+
+Nếu `persistent:false`, website đang dùng fallback JSON và dữ liệu có thể mất khi Render thay container.
+
+## NgducAntiBot
+
+Khi truy cập các trang HTML chính, website hiển thị màn hình xác minh 12 giây (nằm trong yêu cầu 10–15 giây). Sau khi server cấp cookie xác minh, website chuyển về trang chính và hiển thị popup thông báo Admin một lần cho mỗi phiên trình duyệt.
+
+Đây là lớp chống bot ở **application layer**, không phải dịch vụ chống DDoS lưu lượng lớn. Rate-limit cũng được bật ở API.
+
+## Chạy Termux/local
+
 ```bash
 npm install
 npm start
 ```
+
 Mở `http://127.0.0.1:3000`.
 
 ## Docker
+
 ```bash
 docker compose up -d --build
 ```
-Mở `http://127.0.0.1:3000`.
-
-## Tài khoản Admin ban đầu
-Mặc định:
-- username: `ducadmin`
-- password: giá trị `ADMIN_PASSWORD` trong `.env`
-
-**Hãy đổi `ADMIN_PASSWORD` trước khi đưa public.** Nếu database đã được tạo thì đổi biến môi trường không tự đổi mật khẩu Admin đã tồn tại; hãy dùng chức năng reset trong Admin.
-
-## Đưa lên GitHub
-GitHub chỉ lưu mã nguồn; GitHub Pages không chạy được backend Node.js này. Để website đồng bộ nhiều thiết bị, hãy deploy cả thư mục này lên một máy chủ/host có Node.js và **persistent storage**.
-
-Ví dụ luồng:
-`GitHub repository → host Node.js → /data/database.json`
-
-Nếu host có filesystem tạm thời, không dùng bản JSON này cho production vì dữ liệu có thể mất sau mỗi lần restart/deploy. Khi đó nên đổi storage sang PostgreSQL/SQLite persistent.
 
 ## Bảo mật
 - Không commit `.env`.
-- Không đưa token/API key vào GitHub.
-- Đổi mật khẩu Admin mặc định.
-- Nên đặt HTTPS ở reverse proxy/hosting production.
+- Không đưa `SUPABASE_SERVICE_ROLE_KEY` lên GitHub/frontend.
+- Đổi mật khẩu Admin trước khi public.
+- Đặt `ANTIBOT_SECRET` cố định trên Render để cookie xác minh không bị vô hiệu sau restart.
+- Lớp NgducAntiBot/rate-limit không thay thế DDoS protection của hạ tầng.

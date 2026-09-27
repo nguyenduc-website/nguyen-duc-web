@@ -1,5 +1,5 @@
 /* NGUYỄN ĐỨC WEB APP - đồng bộ server-side bằng Netlify Blobs. */
-const DEFAULT_CONFIG={logo:'https://sf-static.upanhlaylink.com/img/image_20260926c9cbd15da7c975fc5c974713e836510c.jpg',brandName:'Nguyễn Đức',profileName:'Nguyễn Đức',profileRole:'Quản trị viên & Developer',profileDesc:'Website cộng đồng • Sensi Pro • Phòng chat • Tin tức • Hỗ trợ 24/7',stats:{products:'150+',docs:'500+',followers:'10K+'},contacts:{zalo1:'https://zalo.me/0923375670',zalo2:'https://zalo.me/0394925338',email:'mailto:chuoipc1129@gmail.com',tiktok:'https://www.tiktok.com/@Oishiicuti'}};
+const DEFAULT_CONFIG={logo:'https://sf-static.upanhlaylink.com/img/image_20260926c9cbd15da7c975fc5c974713e836510c.jpg',brandName:'Nguyễn Đức',profileName:'Nguyễn Đức',profileRole:'Quản trị viên & Developer',profileDesc:'Website cộng đồng • Sensi Pro • Phòng chat • Tin tức • Hỗ trợ 24/7',stats:{products:'150+',docs:'500+',followers:'10K+'},contacts:{zalo1:'https://zalo.me/0923375670',zalo2:'https://zalo.me/0394925338',email:'mailto:chuoipc1129@gmail.com',tiktok:'https://www.tiktok.com/@Oishiicuti'},adminNotice:{enabled:true,title:'🚨 THÔNG BÁO TỪ ADMIN NGUYNDUC',body:'📌 Anh em nào cần hỗ trợ thì có thể tham gia box chat zalo...',links:['🌐 zalo.me/g/cpuxhfrvwd9yifob6xgb','📥 Tuyển người làm phụ: zalo.me/g/nsszfugrkbop4bejnldi'],official:['· Zalo: 0923375670','· Group hỗ trợ: zalo.me/g/nvbvxoloy0vkdfpic2l3'],warning:'⚠️ LƯU Ý: Chỉ mua hàng qua Website này và liên hệ Zalo chính thức!',signature:'- Admin Nguyễn Đức| https://nguyen-duc-web.onrender.com Team'}};
 let APP={user:null,config:DEFAULT_CONFIG,users:[],announcements:[],chat:[],media:[],leaderboard:{views:[],chat:[]}};
 async function api(path,options={}){
   const res=await fetch('/api'+path,{credentials:'include',headers:{'content-type':'application/json',...(options.headers||{})},...options});
@@ -10,7 +10,7 @@ async function api(path,options={}){
   if(!res.ok) throw new Error(data.message||`Yêu cầu thất bại (HTTP ${res.status}).`);
   return data;
 }
-async function syncState(){const s=await api('/state');APP={...APP,...s,config:{...DEFAULT_CONFIG,...(s.config||{}),maintenance:{...DEFAULT_CONFIG.maintenance,...(s.config?.maintenance||{})}}};applyMaintenance(APP);return APP}
+async function syncState(){const s=await api('/state');APP={...APP,...s,config:{...DEFAULT_CONFIG,...(s.config||{}),maintenance:{...DEFAULT_CONFIG.maintenance,...(s.config?.maintenance||{})},adminNotice:{...((DEFAULT_CONFIG.adminNotice)||{}),...(s.config?.adminNotice||{})}}};applyMaintenance(APP);return APP}
 function read(k,f){return f} function write(k,v){return v}
 function getUsers(){return APP.users||[]} function saveUsers(v){APP.users=v}
 function getConfig(){return APP.config||DEFAULT_CONFIG} function saveConfig(v){APP.config=v}
@@ -25,6 +25,26 @@ function getChat(){return APP.chat||[]} async function sendChat(message){try{awa
 function getAnnouncements(){return APP.announcements||[]} async function addAnnouncement(title,body,image){try{await api('/announcement',{method:'POST',body:JSON.stringify({title,body,image})});await syncState();return true}catch(e){alert(e.message);return false}}
 async function deleteAnnouncement(id){try{await api('/announcement/'+encodeURIComponent(id),{method:'DELETE'});await syncState();return true}catch(e){alert(e.message);return false}}
 function getLeaderboard(type){return APP.leaderboard?.[type]||[]}
+
+function showAdminNotice(){
+  if(sessionStorage.getItem('nd_admin_notice_seen')==='1') return;
+  const n=getConfig()?.adminNotice;
+  if(!n?.enabled) return;
+  const old=document.getElementById('adminNoticeOverlay'); if(old) old.remove();
+  const wrap=document.createElement('div'); wrap.id='adminNoticeOverlay'; wrap.className='admin-notice-overlay';
+  wrap.innerHTML=`<div class="admin-notice-card">
+    <div class="admin-notice-icon">🚨</div>
+    <h2>${escapeHTML(n.title||'🚨 THÔNG BÁO TỪ ADMIN NGUYNDUC')}</h2>
+    <div class="admin-notice-block main">${escapeHTML(n.body||'')}</div>
+    <div class="admin-notice-block links">${(n.links||[]).map(x=>`<div>${escapeHTML(x)}</div>`).join('')}</div>
+    <div class="admin-notice-block official"><b>📞 LIÊN HỆ CHÍNH THỨC:</b>${(n.official||[]).map(x=>`<div>${escapeHTML(x)}</div>`).join('')}</div>
+    <div class="admin-notice-block warning">${escapeHTML(n.warning||'')}</div>
+    <div class="admin-notice-sign">${escapeHTML(n.signature||'')}</div>
+    <button type="button" class="admin-notice-btn" onclick="closeAdminNotice()">✓ Tôi đã hiểu</button>
+  </div>`;
+  document.body.appendChild(wrap); document.body.classList.add('notice-open');
+}
+function closeAdminNotice(){sessionStorage.setItem('nd_admin_notice_seen','1');document.getElementById('adminNoticeOverlay')?.remove();document.body.classList.remove('notice-open')}
 
 const MAINTENANCE_TEXT = {
   title: 'SYSTEM MAINTENANCE NOTICE',
@@ -90,4 +110,4 @@ function renderSupport(c){const s=document.getElementById('supportGrid');if(!s)r
 function renderClock(){const e=document.getElementById('liveClock');if(!e)return;const tick=()=>{const n=new Date();e.textContent=n.toLocaleString('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'})};tick();setInterval(tick,1000)}
 async function loadMediaLinks(){const list=document.getElementById('mediaList');if(!list)return;renderMediaLinks(APP.media||[])}
 function renderMediaLinks(items){const list=document.getElementById('mediaList');if(!list)return;if(!items.length){list.innerHTML='<div class="empty-state"><i class="fas fa-inbox"></i><br>Chưa có link tải nào</div>';return}list.innerHTML=items.map(m=>`<a class="media-item" href="${escapeHTML(m.url)}" target="_blank" rel="noopener noreferrer">${m.image?`<img class="media-thumb" src="${escapeHTML(m.image)}" alt="" loading="lazy" onerror="this.style.display='none'">`:''}<div class="media-content"><div class="media-title">${escapeHTML(m.title)}</div><div class="media-desc">Phiên bản ${escapeHTML(m.version||'')}</div></div><div class="media-download"><i class="fas fa-arrow-down"></i></div></a>`).join('')}
-if(typeof document!=='undefined')document.addEventListener('DOMContentLoaded',async()=>{try{await syncState();if(document.getElementById('mainLogo')){await recordVisit();renderMainPage();setInterval(async()=>{try{await syncState();renderMainPage()}catch{}} ,10000)}}catch(e){console.error(e);if(document.getElementById('mainLogo'))renderMainPage()}});
+if(typeof document!=='undefined')document.addEventListener('DOMContentLoaded',async()=>{try{await syncState();if(document.getElementById('mainLogo')){await recordVisit();renderMainPage();showAdminNotice();setInterval(async()=>{try{await syncState();renderMainPage()}catch{}} ,10000)}}catch(e){console.error(e);if(document.getElementById('mainLogo'))renderMainPage()}});

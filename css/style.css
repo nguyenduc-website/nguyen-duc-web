@@ -820,3 +820,10 @@ body.maintenance-active > *:not(#maintenanceOverlay){visibility:hidden !importan
   background:#fff;color:#08080c;font-weight:800;cursor:pointer;
 }
 @media(max-width:600px){.maintenance-overlay{padding:12px}.maintenance-card{padding:22px;border-radius:18px}}
+
+/* ============ NGDUC ADMIN NOTICE ============ */
+body.notice-open{overflow:hidden}
+.admin-notice-overlay{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .18s ease}
+.admin-notice-card{width:min(560px,100%);max-height:min(88vh,760px);overflow:auto;background:#111;border:1px solid #2b2b2b;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.7);padding:26px;color:#f5f5f5}
+.admin-notice-icon{text-align:center;font-size:34px;margin-bottom:6px}.admin-notice-card h2{text-align:center;font-size:19px;margin:0 0 20px}.admin-notice-block{border-left:3px solid #6366f1;background:#181818;border-radius:8px;padding:14px;margin:10px 0;font-size:14px;line-height:1.65}.admin-notice-block.links{border-left-color:#22c55e;color:#8df0ad}.admin-notice-block.official{border-left-color:#3b82f6}.admin-notice-block.warning{border-left-color:#a855f7}.admin-notice-sign{text-align:right;color:#aaa;font-style:italic;font-size:13px;margin:14px 0}.admin-notice-btn{display:block;margin:18px auto 0;padding:11px 24px;border:1px solid #444;border-radius:9px;background:#222;color:#fff;font-weight:700;cursor:pointer}.admin-notice-btn:hover{background:#2d2d2d}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
